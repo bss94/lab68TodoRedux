@@ -7,18 +7,18 @@ import {fetchToDos} from './ToDoSlice';
 import {Spinner} from 'react-bootstrap';
 
 const ToDo = () => {
-  const todosValue = useSelector((state:RootState) => state.todos.value);
-  const isLoading = useSelector((state:RootState)=>state.todos.isLoading)
-  const dispatch:AppDispatch =useDispatch();
+  const todosValue = useSelector((state: RootState) => state.todos.value);
+  const isLoading = useSelector((state: RootState) => state.todos.isLoading);
+  const dispatch: AppDispatch = useDispatch();
 
-  useEffect(()=>{
+  useEffect(() => {
     dispatch(fetchToDos());
-  },[dispatch])
+  }, [dispatch]);
 
   return (
     <>
-     <ToDoForm/>
-      {isLoading?<Spinner/>:<TodoList todos={todosValue}/>}
+      <ToDoForm/>
+      {isLoading ? <Spinner/> : <TodoList todos={todosValue}/>}
 
     </>
   );

@@ -1,4 +1,4 @@
-import {ApiTodos, Todo, TodoMutation} from '../../types';
+import {ApiTodo, ApiTodos, Todo} from '../../types';
 import {AsyncThunk, createAsyncThunk, createSlice, Draft, PayloadAction} from '@reduxjs/toolkit';
 import axiosApi from '../../axiosApi';
 import {RootState} from '../../app/store';
@@ -26,13 +26,20 @@ export const fetchToDos:AsyncThunk<Todo[], void, {state:RootState}> = createAsyn
     }));
   }
 });
-
+export const fetchAddToDo:AsyncThunk<void, void, {state:RootState}> = createAsyncThunk<void, void, {state:RootState}>(
+  'toDo/add',async (newTodo:ApiTodo)=>{
+  await axiosApi.post('/todos.json',newTodo);
+});
+export const fetchDeleteToDo:AsyncThunk<void, void, {state:RootState}> = createAsyncThunk<void, void, {state:RootState}>(
+  'toDo/delete',async (id:string)=>{
+    await axiosApi.delete(`/todos/${id}.json`);
+  });
 
 export const toDoSlice = createSlice({
   name:'todos',
   initialState,
   reducers: {
-    new:()=>{
+    new: () => {
 
     }
   },
@@ -49,26 +56,30 @@ export const toDoSlice = createSlice({
       state.error = true;
       state.isLoading = false
     });
-
+    builder.addCase(fetchAddToDo.pending,(state:Draft<ToDosState>)=>{
+      state.error = false;
+      state.isLoading = true
+    });
+    builder.addCase(fetchAddToDo.fulfilled,(state:Draft<ToDosState>)=>{
+      state.isLoading = false
+    });
+    builder.addCase(fetchAddToDo.rejected,(state:Draft<ToDosState>)=>{
+      state.error = true;
+      state.isLoading = false
+    });
+    builder.addCase(fetchDeleteToDo.pending,(state:Draft<ToDosState>)=>{
+      state.error = false;
+      state.isLoading = true
+    });
+    builder.addCase(fetchDeleteToDo.fulfilled,(state:Draft<ToDosState>)=>{
+      state.isLoading = false
+    });
+    builder.addCase(fetchDeleteToDo.rejected,(state:Draft<ToDosState>)=>{
+      state.error = true;
+      state.isLoading = false
+    });
 
   },
 });
 
-// export const toDoSlice = createSlice({
-//   name:'todos',
-//   initialState,
-//   reducers:{
-//     add:(state)=>{
-//       state.error=true
-//     }
-//   },
-//   extraReducers:(builder)=>{
-//     builder.addCase(fetchToDos.pending,(state)=>{
-//       state.error = false;
-//       state.isLoading = true;
-//     });
-//   },
-//
-// })
 export const toDosReducer = toDoSlice.reducer
-// export const {}=toDoSlice.actions;
