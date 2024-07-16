@@ -1,13 +1,17 @@
 import React from 'react';
 import ToDoItem from '../ToDoItem/ToDoItem';
+import {Todo} from '../../../types';
 
-const TodoList = () => {
+interface Props{
+  todos:Todo[]
+}
+const TodoList:React.FC<Props> = ({todos}) => {
   return (
     <>
       <h4 className="mt-4 mb-3">To Do List</h4>
-      <ToDoItem variant={"success"}/>
-      <ToDoItem variant={"dark"}/>
-      <ToDoItem/>
+      {todos.map(el=>{
+        return<ToDoItem title={el.title} id={el.id} key={el.id}/>
+      })}
     </>
   );
 };
