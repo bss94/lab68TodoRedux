@@ -1,18 +1,16 @@
 import React, {useState} from 'react';
-import {Button, Col, Form, Row} from 'react-bootstrap';
+import {Button, Col, Form, Row, Spinner} from 'react-bootstrap';
 import {ApiTodo, TodoMutation} from '../../types';
-import {useDispatch} from 'react-redux';
-import {AppDispatch} from '../../app/store';
-import {fetchAddToDo, fetchToDos} from '../../containers/ToDo/ToDoSlice';
+import {useDispatch, useSelector} from 'react-redux';
+import {AppDispatch, RootState} from '../../app/store';
+import {fetchAddToDo, fetchToDos, send} from '../../containers/ToDo/ToDoSlice';
 
 const initial: TodoMutation = {title: ''};
 const ToDoForm = () => {
   const [newTodo, setNewTodo] = useState<TodoMutation>(
-    {
-      title: '',
-      completed: false,
-    }
+    initial
   );
+  const isSending = useSelector((state: RootState) => state.todos.isSending);
   const dispatch: AppDispatch = useDispatch();
 
   const onFieldChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,9 +23,11 @@ const ToDoForm = () => {
 
   const onFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    dispatch(send());
     const postData: ApiTodo = {...newTodo, completed: false};
     await dispatch(fetchAddToDo(postData));
     await dispatch(fetchToDos());
+    setNewTodo(initial);
   };
 
 
@@ -46,8 +46,23 @@ const ToDoForm = () => {
           </Form.Group>
         </Col>
         <Col className="text-end">
-          <Button variant="primary" type="submit">
-            Add
+          <Button variant="success"
+                  type="submit"
+                  disabled={isSending}
+          >
+            {isSending
+              ? <>
+                <Spinner
+                  as="span"
+                  animation="border"
+                  size="sm"
+                  role="status"
+                  aria-hidden="true"
+                />
+                <span className="visually-hidden">Loading...</span>
+              </>
+              : 'Save'
+            }
           </Button>
         </Col>
       </Row>
